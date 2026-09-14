@@ -216,7 +216,7 @@ function drawDog(
   ctx.fill()
   ctx.fillStyle = shade(spec.color, -0.2)
   ctx.beginPath()
-  ctx.ellipse(spec.size * 0.55, -spec.size * 0.45, 3, 5, -0.4, 0, 0, Math.PI * 2)
+  ctx.ellipse(spec.size * 0.55, -spec.size * 0.45, 3, 5, -0.4, 0, Math.PI * 2)
   ctx.ellipse(spec.size * 0.55, spec.size * 0.45, 3, 5, 0.4, 0, Math.PI * 2)
   ctx.fill()
   ctx.save()
