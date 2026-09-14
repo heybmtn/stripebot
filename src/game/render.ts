@@ -3,22 +3,29 @@ import { dogProfile, leftoverPatches, TILE, type World } from './world'
 import type { MowerStats } from './upgrades'
 
 const COLORS: Record<TileKind, string> = {
-  grass: '#1c6a32',
-  dirt: '#8a5a32',
-  path: '#b7b3a8',
-  tree: '#1c6a32',
-  flower: '#1c6a32',
-  fence: '#6a4328',
-  furniture: '#5a4638',
-  rock: '#1c6a32',
-  puddle: '#2a6a8a',
-  water: '#1c5f8a',
-  charger: '#c9d4de',
-  hedge: '#145226',
-  doghouse: '#8a4030',
+  grass: '#4a5f3e',
+  dirt: '#a88968',
+  path: '#d4c4a8',
+  tree: '#4a5f3e',
+  flower: '#4a5f3e',
+  fence: '#8b6a4a',
+  furniture: '#7a634e',
+  rock: '#4a5f3e',
+  puddle: '#6a7e86',
+  water: '#5d7380',
+  charger: '#e8dfd0',
+  hedge: '#3e5236',
+  doghouse: '#a56a52',
 }
 
-function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
+function roundRect(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  r: number,
+) {
   const rr = Math.min(r, w / 2, h / 2)
   ctx.beginPath()
   ctx.moveTo(x + rr, y)
@@ -29,18 +36,25 @@ function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: numbe
   ctx.closePath()
 }
 
-export function drawWorld(ctx: CanvasRenderingContext2D, world: World, stats: MowerStats, cam: { x: number; y: number; z: number }) {
+export function drawWorld(
+  ctx: CanvasRenderingContext2D,
+  world: World,
+  stats: MowerStats,
+  cam: { x: number; y: number; z: number },
+) {
   const { width, height } = ctx.canvas
-  ctx.fillStyle = '#102016'
+  ctx.fillStyle = '#d9cbb4'
   ctx.fillRect(0, 0, width, height)
   ctx.save()
   ctx.translate(width / 2, height / 2)
   ctx.scale(cam.z, cam.z)
   ctx.translate(-cam.x, -cam.y)
+
   const lw = world.level.w * TILE
   const lh = world.level.h * TILE
-  ctx.fillStyle = '#2a1a10'
-  ctx.fillRect(-8, -8, lw + 16, lh + 16)
+  ctx.fillStyle = '#c4b396'
+  ctx.fillRect(-12, -12, lw + 24, lh + 24)
+
   for (let y = 0; y < world.level.h; y++) {
     for (let x = 0; x < world.level.w; x++) {
       const t = world.tiles[y]![x]!
@@ -49,14 +63,14 @@ export function drawWorld(ctx: CanvasRenderingContext2D, world: World, stats: Mo
       if (t.kind === 'grass' || t.kind === 'puddle') {
         if (t.cut) {
           const a = t.stripe === 0 ? 0.08 : -0.08
-          const base = t.stripe === 0 ? '#8ee36a' : '#79d45a'
-          ctx.fillStyle = shade(base, t.shade * 0.1 + a)
+          const base = t.stripe === 0 ? '#a8b88a' : '#93a676'
+          ctx.fillStyle = shade(base, t.shade * 0.08 + a)
         } else {
-          ctx.fillStyle = shade('#165c2c', t.shade * 0.16)
+          ctx.fillStyle = shade('#3f5236', t.shade * 0.12)
         }
         ctx.fillRect(px, py, TILE, TILE)
         if (t.kind === 'puddle') {
-          ctx.fillStyle = t.cut ? '#3aa0c888' : '#1d6d9888'
+          ctx.fillStyle = t.cut ? '#7a949888' : '#5e758088'
           ctx.fillRect(px, py, TILE, TILE)
         }
       } else {
@@ -69,6 +83,7 @@ export function drawWorld(ctx: CanvasRenderingContext2D, world: World, stats: Mo
       }
     }
   }
+
   for (let y = 0; y < world.level.h; y++) {
     for (let x = 0; x < world.level.w; x++) {
       const t = world.tiles[y]![x]!
@@ -82,21 +97,23 @@ export function drawWorld(ctx: CanvasRenderingContext2D, world: World, stats: Mo
       if (t.kind === 'doghouse') drawKennel(ctx, cx, cy)
       if (t.kind === 'charger') drawCharger(ctx, cx, cy, world.time)
       if (t.kind === 'water') {
-        ctx.fillStyle = '#1470a8'
+        ctx.fillStyle = '#5d7380'
         ctx.fillRect(x * TILE, y * TILE, TILE, TILE)
-        ctx.fillStyle = '#7ad7ff44'
+        ctx.fillStyle = '#c5d5d844'
         ctx.fillRect(x * TILE, y * TILE + ((world.time * 8 + x) % TILE), TILE, 2)
       }
     }
   }
+
   if (stats.mapping) {
-    ctx.fillStyle = '#ffe56655'
+    ctx.fillStyle = '#c47a4a55'
     for (const p of leftoverPatches(world).filter((_, i) => i % 3 === 0)) {
       ctx.beginPath()
       ctx.arc(p.x, p.y, 2.2, 0, Math.PI * 2)
       ctx.fill()
     }
   }
+
   for (const toy of world.toys) drawToy(ctx, toy.x, toy.y, toy.kind)
   for (const s of world.sprinklers) drawSprinkler(ctx, s.x, s.y, s.angle)
   for (const p of world.particles) {
@@ -105,8 +122,10 @@ export function drawWorld(ctx: CanvasRenderingContext2D, world: World, stats: Mo
     ctx.fillRect(p.x, p.y, p.size, p.size)
   }
   ctx.globalAlpha = 1
+
   for (const dog of world.dogs) drawDog(ctx, dog.x, dog.y, dog.facing, dog.kind, dog.wag, dog.bark, dog.state)
   drawMower(ctx, world)
+
   if (world.level.rain) {
     ctx.strokeStyle = '#cfe9ff66'
     ctx.lineWidth = 1
@@ -119,6 +138,7 @@ export function drawWorld(ctx: CanvasRenderingContext2D, world: World, stats: Mo
       ctx.stroke()
     }
   }
+
   ctx.restore()
 }
 
@@ -153,12 +173,12 @@ function drawMower(ctx: CanvasRenderingContext2D, world: World) {
   ctx.arc(-2, 0, 6, m.blade, m.blade + Math.PI)
   ctx.stroke()
   roundRect(ctx, -11, -8, 22, 16, 5)
-  ctx.fillStyle = m.wet > 0 ? '#d5e7ff' : '#eef3f8'
+  ctx.fillStyle = m.wet > 0 ? '#d5ddd8' : '#f3ead8'
   ctx.fill()
-  ctx.fillStyle = '#3a86ff'
+  ctx.fillStyle = '#6d7d5c'
   roundRect(ctx, -6, -5, 12, 5, 2)
   ctx.fill()
-  ctx.fillStyle = world.battery < 20 ? '#ff5d4a' : '#5dff8a'
+  ctx.fillStyle = world.battery < 20 ? '#b45a3c' : '#7a8f6a'
   ctx.fillRect(8, -2, 3, 4)
   ctx.fillStyle = '#1a1a22'
   ctx.beginPath()
@@ -166,13 +186,22 @@ function drawMower(ctx: CanvasRenderingContext2D, world: World) {
   ctx.arc(6, 5, 1.6, 0, Math.PI * 2)
   ctx.fill()
   if (m.turbo > 0) {
-    ctx.fillStyle = '#ffe566aa'
+    ctx.fillStyle = '#d4a574aa'
     ctx.fillRect(-16, -3, 6, 6)
   }
   ctx.restore()
 }
 
-function drawDog(ctx: CanvasRenderingContext2D, x: number, y: number, facing: number, kind: DogKind, wag: number, bark: number, state: string) {
+function drawDog(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  facing: number,
+  kind: DogKind,
+  wag: number,
+  bark: number,
+  state: string,
+) {
   const spec = dogProfile(kind)
   ctx.save()
   ctx.translate(x, y)
@@ -187,7 +216,7 @@ function drawDog(ctx: CanvasRenderingContext2D, x: number, y: number, facing: nu
   ctx.fill()
   ctx.fillStyle = shade(spec.color, -0.2)
   ctx.beginPath()
-  ctx.ellipse(spec.size * 0.55, -spec.size * 0.45, 3, 5, -0.4, 0, Math.PI * 2)
+  ctx.ellipse(spec.size * 0.55, -spec.size * 0.45, 3, 5, -0.4, 0, 0, Math.PI * 2)
   ctx.ellipse(spec.size * 0.55, spec.size * 0.45, 3, 5, 0.4, 0, Math.PI * 2)
   ctx.fill()
   ctx.save()
@@ -203,30 +232,30 @@ function drawDog(ctx: CanvasRenderingContext2D, x: number, y: number, facing: nu
   ctx.fill()
   ctx.restore()
   if (bark > 0 || state === 'chase') {
-    ctx.fillStyle = '#fff'
-    ctx.font = 'bold 10px Fredoka, sans-serif'
+    ctx.fillStyle = '#c47a4a'
+    ctx.font = '600 12px Fraunces, Georgia, serif'
     ctx.fillText('!', x + 8, y - spec.size - 2)
   }
 }
 
 function drawTree(ctx: CanvasRenderingContext2D, x: number, y: number) {
   drawShadow(ctx, x, y + 4, 10, 5)
-  ctx.fillStyle = '#6a3e22'
+  ctx.fillStyle = '#5a3e28'
   ctx.fillRect(x - 2, y - 2, 4, 8)
-  ctx.fillStyle = '#1f8a3c'
+  ctx.fillStyle = '#4a6a3e'
   ctx.beginPath()
   ctx.arc(x, y - 6, 10, 0, Math.PI * 2)
   ctx.fill()
-  ctx.fillStyle = '#2db854'
+  ctx.fillStyle = '#5d7a4c'
   ctx.beginPath()
   ctx.arc(x - 4, y - 8, 6, 0, Math.PI * 2)
   ctx.fill()
 }
 
 function drawFlower(ctx: CanvasRenderingContext2D, x: number, y: number, s: number) {
-  const colors = ['#ff5d8f', '#ffd15c', '#ff8a4a', '#c77dff']
+  const colors = ['#c98990', '#d4b56a', '#c47a4a', '#a892b8']
   const c = colors[Math.floor(s * colors.length)]!
-  ctx.fillStyle = '#3aa84a'
+  ctx.fillStyle = '#6a8a58'
   ctx.fillRect(x - 1, y, 2, 5)
   ctx.fillStyle = c
   for (let i = 0; i < 5; i++) {
@@ -235,7 +264,7 @@ function drawFlower(ctx: CanvasRenderingContext2D, x: number, y: number, s: numb
     ctx.arc(x + Math.cos(a) * 3, y - 2 + Math.sin(a) * 3, 2.2, 0, Math.PI * 2)
     ctx.fill()
   }
-  ctx.fillStyle = '#ffe566'
+  ctx.fillStyle = '#e8d9a8'
   ctx.beginPath()
   ctx.arc(x, y - 2, 1.6, 0, Math.PI * 2)
   ctx.fill()
@@ -263,11 +292,11 @@ function drawChair(ctx: CanvasRenderingContext2D, x: number, y: number) {
 
 function drawFence(ctx: CanvasRenderingContext2D, x: number, y: number, kind: TileKind) {
   if (kind === 'hedge') {
-    ctx.fillStyle = '#0f6b32'
+    ctx.fillStyle = '#3e5236'
     ctx.beginPath()
     ctx.arc(x, y, 8, 0, Math.PI * 2)
     ctx.fill()
-    ctx.fillStyle = '#1a8a44'
+    ctx.fillStyle = '#54724a'
     ctx.beginPath()
     ctx.arc(x + 3, y - 2, 5, 0, Math.PI * 2)
     ctx.fill()
@@ -294,11 +323,11 @@ function drawKennel(ctx: CanvasRenderingContext2D, x: number, y: number) {
 }
 
 function drawCharger(ctx: CanvasRenderingContext2D, x: number, y: number, time: number) {
-  ctx.fillStyle = '#9be7ff'
+  ctx.fillStyle = '#b7a07a'
   roundRect(ctx, x - 8, y - 8, 16, 16, 3)
   ctx.fill()
-  ctx.fillStyle = `rgba(255,229,102,${0.55 + Math.sin(time * 6) * 0.25})`
-  ctx.font = 'bold 12px Fredoka, sans-serif'
+  ctx.fillStyle = `rgba(109,139,122,${0.55 + Math.sin(time * 6) * 0.25})`
+  ctx.font = 'bold 12px Fraunces, Georgia, serif'
   ctx.textAlign = 'center'
   ctx.fillText('⚡', x, y + 4)
   ctx.textAlign = 'left'
@@ -306,7 +335,7 @@ function drawCharger(ctx: CanvasRenderingContext2D, x: number, y: number, time: 
 
 function drawToy(ctx: CanvasRenderingContext2D, x: number, y: number, kind: 'bone' | 'ball') {
   if (kind === 'ball') {
-    ctx.fillStyle = '#ff7a3a'
+    ctx.fillStyle = '#c47a4a'
     ctx.beginPath()
     ctx.arc(x, y, 4, 0, Math.PI * 2)
     ctx.fill()
@@ -327,7 +356,7 @@ function drawSprinkler(ctx: CanvasRenderingContext2D, x: number, y: number, angl
   ctx.beginPath()
   ctx.arc(x, y, 4, 0, Math.PI * 2)
   ctx.fill()
-  ctx.strokeStyle = '#9ad8ff88'
+  ctx.strokeStyle = '#a8c0c488'
   ctx.lineWidth = 6
   ctx.beginPath()
   ctx.moveTo(x, y)
@@ -336,7 +365,11 @@ function drawSprinkler(ctx: CanvasRenderingContext2D, x: number, y: number, angl
 }
 
 export function cameraFor(world: World, canvas: HTMLCanvasElement) {
-  const z = Math.min(canvas.width / (world.level.w * TILE + 40), canvas.height / (world.level.h * TILE + 40), 2.4)
+  const z = Math.min(
+    canvas.width / (world.level.w * TILE + 72),
+    canvas.height / (world.level.h * TILE + 72),
+    2.2,
+  )
   const follow = z < 1.05
   return {
     x: follow ? world.mower.x : (world.level.w * TILE) / 2,
