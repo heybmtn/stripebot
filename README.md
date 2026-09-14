@@ -6,7 +6,7 @@ A 2D top-down arcade game: drive a robot mower, cut striped lawns, manage batter
 
 **Play:** https://heybmtn.github.io/stripebot/
 
-If the play link 404s, turn on Pages: Settings → Pages → Deploy from a branch → `main` / `docs`.
+If the play link 404s, turn on Pages: repo Settings → Pages → Deploy from a branch → `main` / `docs`.
 
 Drive with WASD or arrows. Shift/Space is turbo after you buy it. Esc pauses.
 
