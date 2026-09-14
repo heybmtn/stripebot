@@ -1,11 +1,14 @@
 # Stripebot
 
-A 2D top-down arcade game: you drive a little robot mower through gardens, turning dark uncut grass into striped lawn while managing battery, dogs, and clutter.
+A 2D top-down arcade game: drive a robot mower, cut striped lawns, manage battery, dodge dogs.
 
-**Play it:** https://heybmtn.github.io/stripebot/
-**Source:** https://github.com/heybmtn/stripebot
+**Repo:** https://github.com/heybmtn/stripebot
 
-Drive with WASD or arrow keys. Shift or Space fires turbo once you buy it. Esc pauses.
+**Play:** https://heybmtn.github.io/stripebot/
+
+If the play link 404s, turn on Pages: Settings → Pages → Deploy from a branch → `main` / `docs`.
+
+Drive with WASD or arrows. Shift/Space is turbo after you buy it. Esc pauses.
 
 ## Run locally
 
